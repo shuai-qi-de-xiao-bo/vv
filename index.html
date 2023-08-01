@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>threejs</title>
+  <script defer src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.154.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.154.0/examples/jsm/"
+      }
+    }
+  </script>
+  <!-- <script type="module" src="index.js"></script> -->
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls";
+    import Stats from "three/addons/libs/stats.module.js";
+    import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+    function setScene() {
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x000000);
+      //   const axes = new THREE.AxesHelper(150); // 坐标轴
+      //   scene.add(axes);
+      return scene;
+    }
+
+    function setCamera(width, height) {
+      //   const camera = new THREE.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, 1, 3000);
+      const camera = new THREE.PerspectiveCamera(100, width / height, 1, 4000);
+      camera.position.set(0, 0, 6);
+      camera.lookAt(0, 0, 0);
+      return camera;
+    }
+
+    function setLight() {
+      // 点光源
+      // const light = new THREE.PointLight('0xffffff', 1.0);
+      // 环境光
+      // const light = new THREE.AmbientLight(0xffffff, 1);
+      // 平行光
+      const light = new THREE.DirectionalLight(0xffffff, 1.0);
+
+      light.position.set(0, 0, 6);
+      return light;
+    }
+
+    function renderModel(renderer, scene, camera) {
+      const loader = new GLTFLoader();
+      loader.load(
+        "./demo.glb",
+        function (gltf) {
+          camera.lookAt(gltf.scene.position);
+          scene.add(gltf.scene);
+          renderer.render(scene, camera);
+        },
+        undefined,
+        function (error) {
+          console.error(error);
+        }
+      );
+    }
+
+    function renderScene() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const scene = setScene();
+      const light = setLight();
+      scene.add(light);
+      const camera = setCamera(width, height);
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(width, height);
+      renderer.render(scene, camera);
+      //   const pointLightHelper = new THREE.PointLightHelper(light, 10);
+      //   scene.add(pointLightHelper);
+      const controls = new OrbitControls(camera, renderer.domElement);
+      // controls.target.set(1000, 0, 1000);
+      controls.update();
+      controls.addEventListener("change", () => renderer.render(scene, camera));
+      document.body.appendChild(renderer.domElement);
+      //   const stats = new Stats();
+
+      //   document.body.appendChild(stats.domElement);
+      window.onresize = function () {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+      };
+      renderModel(renderer, scene, camera);
+      function animate() {
+        // stats.update();
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      }
+      //   animate();
+    }
+
+    renderScene();
+
+  </script>
+  <style>
+    body {
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body>
+</body>
+<script>
+  const func = () => {
+
+  }
+</script>
+
+</html>
